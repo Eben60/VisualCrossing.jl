@@ -17,7 +17,7 @@ function wquery(lastday=nothing, duration=nothing, station_id=nothing)
 
     api_key = get_api_key()
 
-    query = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$(station_id)/$(firstday)/$(lastday)?key=$(api_key)&include=days&elements=tempmax,tempmin,temp&unitGroup=metric"
+    query = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$(station_id)/$(firstday)/$(lastday)?key=$(api_key)&include=days&elements=tempmax,tempmin,temp,datetime&unitGroup=metric"
     return query
 end
 
