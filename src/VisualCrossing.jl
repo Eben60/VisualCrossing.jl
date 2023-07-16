@@ -1,30 +1,57 @@
 module VisualCrossing
-using Scratch
 
-const SCRATCH_DATA_DIR = "user_data"
-const SCRATCH_API_DIR = "api"
-const API_KEY_FILE = "api_key.txt"
+using Scratch, Dates, HTTP
 
-function write_api_key(key)
-    d = @get_scratch!(SCRATCH_API_DIR)
-    f = joinpath(d, API_KEY_FILE)
-    open(f, "w") do file
-        write(file, "$(key)\n")
+include("file_functions.jl")
+
+function wquery(lastday=nothing, duration=nothing, station_id=nothing)
+    if isnothing(duration) 
+        duration = Dates.Day(1)
+    else
+        duration = Dates.Day(duration)
     end
-    return f
+
+    isnothing(lastday) && (lastday = Date(now()) - Dates.Day(1))
+    firstday = lastday - duration
+    isnothing(station_id) && (station_id = get_station_id())
+
+    api_key = get_api_key()
+
+    query = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$(station_id)/$(firstday)/$(lastday)?key=$(api_key)&include=days&elements=tempmax,tempmin,temp&unitGroup=metric"
+    return query
 end
 
-export write_api_key
+export wquery
 
-function get_api_key()
-    d = @get_scratch!(SCRATCH_API_DIR)
-    f = joinpath(d, API_KEY_FILE)
-    key = open(f, "r") do file
-        key = readline(file)
+function getpage(url)
+    r = HTTP.get(url; status_exception=false)
+    ok = r.status == 200
+    if ok
+        body = String(r.body)
+    else
+        body = ""
     end
-    return key
+    return (; ok, body)
 end
 
+function wfetch(fname="testfile.txt", lastday=nothing, duration=nothing, station_id=nothing; overwrite=false, save2file=true)
+    fname == "testfile.txt" && (overwrite=true)
+    qurl = wquery(lastday, duration, station_id)
+    (; ok, body) = getpage(qurl)
 
+    if ok
+        data = body
+        if save2file 
+            datafile = savedata(fname, data, overwrite)
+
+        end
+    else
+        data = datafile = nothing
+    end
+
+    return (;ok, data, datafile)
+end
+
+export wfetch
 
 end # module VisualCrossing
