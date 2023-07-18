@@ -1,7 +1,7 @@
 const SCRATCH_DATA_DIR = "user_data"
 const SCRATCH_API_DIR = "api"
 const API_KEY_FILE = "api_key.txt"
-const STATION_ID_FILE = "station_id.txt"
+const STATION_ID_FILE = "station_id"
 
 function write_api_key(key)
     d = @get_scratch!(SCRATCH_API_DIR)
@@ -23,13 +23,14 @@ function get_api_key()
     return key
 end
 
-function get_station_id()
+function get_station_id(i)
     d = @get_scratch!(SCRATCH_API_DIR)
-    f = joinpath(d, STATION_ID_FILE)
-    key = open(f, "r") do file
-        key = readline(file)
+    fname = "$(STATION_ID_FILE )_$i.txt" 
+    f = joinpath(d, fname)
+    station_id = open(f, "r") do file
+        readline(file)
     end
-    return key
+    return station_id
 end
 
 data_file_path(fname) = joinpath(@get_scratch!(SCRATCH_DATA_DIR), fname)
