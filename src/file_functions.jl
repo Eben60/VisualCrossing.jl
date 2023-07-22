@@ -35,6 +35,11 @@ end
 
 data_file_path(fname) = joinpath(@get_scratch!(SCRATCH_DATA_DIR), fname)
 data_file_path() = @get_scratch!(SCRATCH_DATA_DIR)
+testfile() = data_file_path("rec_2022-05-15_2022-09-15_station-1.json")
+
+yearsrec(y, station_no=1) =  glob("rec_$(y)-05-15*_station-$(station_no).json", data_file_path())[1]
+
+export testfile, yearsrec
  
 function savedata(fname, data, overwrite=false)
     f = data_file_path(fname)

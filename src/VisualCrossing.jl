@@ -60,6 +60,14 @@ function fetch_period(year=nothing, firstday=nothing, duration=nothing; station_
     wfetch(fname, lastday, duration; station_id)
 end
 
+function dayfromapril1st(d)
+    y = year(d)
+    april1st = dayofyear(Date(y, 4, 1))
+    return dayofyear(d) - april1st + 1
+end
+
+export dayfromapril1st
+
 function json2df(source, fromfile=true)
     if fromfile
         jsondata = open(source, "r") do file
@@ -71,8 +79,17 @@ function json2df(source, fromfile=true)
     # jsondata = String(jsondata)
     data = JSON3.read(jsondata).days
     df = DataFrame(data)
-    transform!(df, :datetime => ByRow(Date) => :date)
-    select!(df, :date, Not(:datetime))
+    transform!(df, :datetime => ByRow(Date) => :Date)
+    transform!(df, :Date => ByRow(dayfromapril1st) => :DayFromApril1st)
+    select!(df, :Date, :DayFromApril1st, Not(:datetime))
+    return df
+end
+
+function json2df(; station_no=1)
+    files = list_jsons(station_no)
+    dfs = [json2df(f) for f in files]
+    df = vcat(dfs...)
+    unique!(df)
     return df
 end
 
@@ -83,6 +100,8 @@ function fetch_years(lastyear, years=8)
     end
 end
 
-export wfetch, period_data, fetch_period, json2df, fetch_years, data_file_path
+
+
+export wfetch, period_data, fetch_period, json2df, fetch_years, data_file_path, json2df
 
 end # module VisualCrossing
