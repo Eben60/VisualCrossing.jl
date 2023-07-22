@@ -66,7 +66,7 @@ function dayfromapril1st(d)
     return dayofyear(d) - april1st # zero-indexing :)
 end
 
-export dayfromapril1st
+miss4nothing!(df) = mapcols!(col -> replace(col, nothing => missing), df)
 
 function json2df(source, fromfile=true)
     if fromfile
@@ -121,15 +121,9 @@ end
 function groupstat(df, fn, sourcecol=nothing, d1=nothing, d2=nothing)
     df = deepcopy(df)
     gdf = groupby(filterspan(df, d1, d2), :Year)
-    cumstat = combine(gdf, sourcecol => fn => :cumstat)
+    fnm(v) = fn(skipmissing(v))
+    cumstat = combine(gdf, sourcecol => fnm => :cumstat)
     return cumstat
-end
-
-function miss4nothing!(df)
-    for nm in names(df)
-        df[!, nm] = replace(df[!, nm], nothing => missing)
-    end
-    return df
 end
 
 export wfetch, period_data, fetch_period, json2df, fetch_years, data_file_path, json2df, span, filterspan, groupstat, miss4nothing!
