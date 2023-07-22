@@ -34,6 +34,7 @@ function get_station_id(i)
 end
 
 data_file_path(fname) = joinpath(@get_scratch!(SCRATCH_DATA_DIR), fname)
+data_file_path() = @get_scratch!(SCRATCH_DATA_DIR)
  
 function savedata(fname, data, overwrite=false)
     f = data_file_path(fname)
@@ -52,3 +53,7 @@ function readdata(fname="testfile.txt")
     return String(data)
 end
 export readdata
+
+list_jsons(station_no) = glob("rec_*_station-$(station_no).json", data_file_path())
+
+export list_jsons

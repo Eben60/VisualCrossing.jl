@@ -1,6 +1,6 @@
 module VisualCrossing
 
-using Scratch, Dates, HTTP, DataFrames, JSON3
+using Scratch, Dates, HTTP, DataFrames, JSON3, Glob
 
 include("file_functions.jl")
 
@@ -83,6 +83,6 @@ function fetch_years(lastyear, years=8)
     end
 end
 
-export wfetch, period_data, fetch_period, json2df, fetch_years
+export wfetch, period_data, fetch_period, json2df, fetch_years, data_file_path
 
 end # module VisualCrossing
